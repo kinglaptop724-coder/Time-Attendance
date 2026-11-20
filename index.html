@@ -12,8 +12,10 @@
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
-  html,body{margin:0;height:100%}
-  body{display:flex;align-items:center;justify-content:center;background:#6C5CE7;color:#fff;font-family:system-ui,sans-serif;text-align:center}
+  /* หมายเหตุ: ห้ามใส่ display:flex / align-items:center / height:100% ที่ html,body
+     เพราะหน้าจริงถูกเขียนทับด้วย document.write และสไตล์ตัวเปลือกอาจค้างจนเนื้อหาสูงเกินจอถูกตัดขอบบน */
+  html,body{margin:0;background:#6C5CE7}
+  #shell-box{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-family:system-ui,sans-serif;text-align:center}
   .box{padding:24px;max-width:420px}
   .spin{width:44px;height:44px;margin:0 auto 14px;border:4px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:s .9s linear infinite}
   @keyframes s{to{transform:rotate(360deg)}}
@@ -23,7 +25,7 @@
 </style>
 </head>
 <body>
-<div class="box" id="box"><div class="spin"></div><p>กำลังโหลด...</p></div>
+<div id="shell-box"><div class="box" id="box"><div class="spin"></div><p>กำลังโหลด...</p></div></div>
 
 <script>
 /* ไฟล์นี้เป็น "เปลือก" — ไม่ต้องแก้อีก
@@ -41,6 +43,13 @@
 
   function render(html) {
     window.__API_URL = APPS_SCRIPT_URL;
+    // ล้างสไตล์/แอตทริบิวต์ของตัวเปลือกก่อนเขียนหน้าจริงทับ กันสไตล์ค้าง
+    try {
+      document.documentElement.removeAttribute('style');
+      document.documentElement.removeAttribute('class');
+      document.body.removeAttribute('style');
+      document.body.removeAttribute('class');
+    } catch (e) {}
     document.open(); document.write(html); document.close();
   }
   function fail(msg) {
